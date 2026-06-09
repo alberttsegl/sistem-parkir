@@ -267,7 +267,7 @@
   </div>
 </div>
 
-<div class="page-footer pt-5">© ASAT 2026, made by <a href="#">Eure Reeyn</a> for ASAT Web And Mobile Development - SMKN 1 Cibinong.</div>
+<div class="page-footer pt-5">© ASAT 2026, made by <a href="#">Albert Septian Gulo | XI SIJA 1</a> for ASAT Web And Mobile Development - SMKN 1 Cibinong.</div>
 
 <script>
     function selectBuildingCard(locId, element) {
