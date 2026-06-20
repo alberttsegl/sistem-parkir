@@ -1,0 +1,31 @@
+version: '3'
+
+services:
+  web-albert:
+    build: .
+    image: laravel-app:latest
+    ports:
+      - "8081-8083:8000"
+    networks:
+      - asat-net
+    depends_on:
+      - db-albert
+
+  db-albert:
+    image: mariadb:10.6
+    container_name: db-albert
+    environment:
+      MARIADB_ALLOW_EMPTY_PASSWORD: "yes"
+      MARIADB_DATABASE: parkir
+    volumes:
+      - asat-vol:/var/lib/mysql
+    networks:
+      - asat-net
+
+networks:
+  asat-net:
+    driver: bridge
+
+volumes:
+  asat-vol:
+    driver: local
