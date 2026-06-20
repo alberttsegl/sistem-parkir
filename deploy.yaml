@@ -1,0 +1,36 @@
+- name: Ansible Playbook untuk VM 2
+  hosts: target
+  become: yes
+  tasks:
+
+    - name: Memastikan dependensi telah terinstall
+      apt:
+        name: [apt-transport-https, ca-certificates, curl, gnupg, lsb-release, docker.io, docker-compose]
+        state: present
+        update_cache: yes
+
+    - name: Melakukan copy source code ke direktori target di VM2
+      copy:
+        src: "/home/albert/asat"
+        dest: "/var/www/laravel-albert"
+
+    - name: Melakukan build custom image berdasarkan file Dockerfile
+      shell: "docker build -t laravel-app:latest /var/www/laravel-albert"
+
+    - name: Menjalankan stack container menggunakan docker-compose up -d dan melakukan scaling 3 replika
+      shell: "docker-compose -f /var/www/laravel-albert/docker-compose.yml up -d --scale web-albert=3"
+
+    - name: Menjalankan php artisan migrate untuk membuat tabel ke MariaDB
+      shell: |
+        FIRST_CONTAINER=$(docker ps --filter "name=laravel-albert_web-albert" -q | head -n 1)
+        sleep 12
+        docker exec $FIRST_CONTAINER php artisan migrate --force
+
+    - name: Mengubah teks welcome page agar menampilkan port dinamis saat di-refresh
+      shell: |
+        CONTAINERS=$(docker ps --filter "name=laravel-albert_web-albert" -q)
+        PORT=8081
+        for CT in $CONTAINERS; do
+          docker exec $CT sh -c "echo '<h1>Aplikasi berjalan di port '$PORT'</h1>' > /var/www/html/resources/views/welcome.blade.php"
+          PORT=$((PORT+1))
+        done
